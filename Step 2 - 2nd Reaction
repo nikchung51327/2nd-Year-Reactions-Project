@@ -191,6 +191,7 @@ T = 290 + 273.15;
     KO2    = A_KO2    * exp(-Ea_KO2/(R*T));
     KH2O   = A_KH2O   * exp(-Ea_KH2O/(R*T));
     kCO    = A_kCO    * exp(-Ea_kCO/(R*T));
+alpha = 0.44*1.1;
 %------------------------------------------------------
 %Concentration of HCHO vs Rate of CO
 %using rate equation to plot (data set a)
