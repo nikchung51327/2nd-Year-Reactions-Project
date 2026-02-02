@@ -1,6 +1,8 @@
 clf
 clear
 clc
+close all 
+set(groot, 'DefaultFigureColor', 'w');
  R = 8.314; % J/mol/K
  %TEMPERATURE AT 250 C
 T = 250 + 273.15;
@@ -26,94 +28,209 @@ T = 250 + 273.15;
 %rate with constant O2 vs HCOH
 %oxygen at 5% concentration 
 %250 degrees
-HCHO_a = [0.734917733 1.524680073 2.413162706 2.654478976 3.411334552 4.091407678 5.188299817 6.175502742
+HCHO_a_250 = [0.734917733 1.524680073 2.413162706 2.654478976 3.411334552 4.091407678 5.188299817 6.175502742
 ];
 
-R_CO_a = 10^-3 .*[0.021367521 0.051994302 0.061253561 0.06980057 0.095441595 0.113960114 0.134615385 0.153846154];
+R_CO_a_250 = 10^-3 .*[0.021367521 0.051994302 0.061253561 0.06980057 0.095441595 0.113960114 0.134615385 0.153846154];
 
-ln_HCHO_a = log(HCHO_a);
-ln_R_CO_a = log(R_CO_a);
-
-scatter(ln_HCHO_a,ln_R_CO_a,'x');
+ln_HCHO_a_250 = log(HCHO_a_250);
+ln_R_CO_a_250 = log(R_CO_a_250);
+figure("Name","Reaction Order of HCHO (250C)")
+scatter(ln_HCHO_a_250,ln_R_CO_a_250,'x',"SizeData",100,"LineWidth",2);
 xlabel("ln(concentration of HCHO)")
 ylabel("ln(Rate of CO formation)")
 hold on
-coeff_a = polyfit(ln_HCHO_a,ln_R_CO_a,1);
-y_values = polyval(coeff_a , ln_HCHO_a);
-plot(ln_HCHO_a, y_values, 'r-');
+coeff_a = polyfit(ln_HCHO_a_250,ln_R_CO_a_250,1);
+y_values = polyval(coeff_a , ln_HCHO_a_250);
+plot(ln_HCHO_a_250, y_values, 'r-','LineWidth',1.5);
 legend('Data Points', 'Linear Fit');
-title("5% Oxygen, ln(HCHO) vs ln(rate of CO)")
+title("5% Oxygen, ln(HCHO) vs ln(rate of CO) at 250C")
 hold off
 %R^2 value 
-mdl = fitlm(y_values,ln_R_CO_a);           % X predictors, y response
-eqn2_a_rsquared = mdl.Rsquared.Ordinary
+mdl = fitlm(y_values,ln_R_CO_a_250);           % X predictors, y response
+eqn2_a_250_rsquared = mdl.Rsquared.Ordinary
 
 %data set b
 %rate with constant HCOH vs O2
 %HCOH at 3.5% concentration 
 %250 degrees
-O2_b = [1.085502878 1.98787339 2.888599616 3.886544259 4.885996163 10.02959715 14.71245547];
+O2_b_250 = [1.085502878 1.98787339 2.888599616 3.886544259 4.885996163 10.02959715 14.71245547];
 
-R_CO_b = 10^-3 .*[0.069213483 0.069606742 0.079438202 0.091235955 0.094382022 0.11011236 0.110505618];
+R_CO_b_250 = 10^-3 .*[0.069213483 0.069606742 0.079438202 0.091235955 0.094382022 0.11011236 0.110505618];
 
-ln_O2_b = log(O2_b);
-ln_R_CO_b = log(R_CO_b);
-figure(2)
-scatter(ln_O2_b,ln_R_CO_b,'x');
+ln_O2_b_250 = log(O2_b_250);
+ln_R_CO_b_250 = log(R_CO_b_250);
+figure("Name","Reaction Order of O2 (250C)")
+scatter(ln_O2_b_250,ln_R_CO_b_250,'x',"SizeData",100,"LineWidth",2);
 xlabel("ln(concentration of O2)")
 ylabel("ln(Rate of CO formation)")
 hold on
-coeff_b = polyfit(ln_O2_b,ln_R_CO_b,1);
-y_values = polyval(coeff_b, ln_O2_b);
-plot(ln_O2_b, y_values, 'r-');
+coeff_b = polyfit(ln_O2_b_250,ln_R_CO_b_250,1);
+y_values = polyval(coeff_b, ln_O2_b_250);
+plot(ln_O2_b_250, y_values, 'r-','LineWidth',1.5);
 legend('Data Points', 'Linear Fit');
-title("3.5% Formalaldehyde, ln(O2) vs ln(rate of CO)")
+title("3.5% Formalaldehyde, ln(O2) vs ln(rate of CO) at 250C")
 %R^2 value 
-mdl = fitlm(y_values,ln_R_CO_b);           % X predictors, y response
-eqn2_b_rsquared = mdl.Rsquared.Ordinary
+mdl = fitlm(y_values,ln_R_CO_b_250);           % X predictors, y response
+eqn2_b_250_rsquared = mdl.Rsquared.Ordinary
 
-eqn2_HCHO_order = coeff_a(1)
-eqn2_O2_order = coeff_b(1)
+eqn2_HCHO_order_250 = coeff_a(1)
+eqn2_O2_order_250 = coeff_b(1)
 
+%------------------------------------------------------------
+%-----------------------290 degrees--------------------------
+
+%data set a
+%rate with constant O2 vs HCOH
+%oxygen at 5% concentration 
+%290 degrees
+HCHO_a_290 = [0.764044944 1.382022472 2.303370787 2.820224719 3.04494382 3.06741573 4.078651685 5.191011236 6.168539326];
+
+R_CO_a_290 = 10^-3 .*[0.06282318 0.089151381 0.131491618 0.154381809 0.161262098 0.184058389 0.245788918 0.289305035 0.31912033];
+
+ln_HCHO_a_290 = log(HCHO_a_290);
+ln_R_CO_a_290 = log(R_CO_a_290);
+figure("Name","Reaction Order of HCHO (290C)")
+scatter(ln_HCHO_a_290,ln_R_CO_a_290,'x',"SizeData",100,"LineWidth",2);
+xlabel("ln(concentration of HCHO)")
+ylabel("ln(Rate of CO formation)")
+hold on
+coeff_a_290 = polyfit(ln_HCHO_a_290,ln_R_CO_a_290,1);
+y_values = polyval(coeff_a_290 , ln_HCHO_a_290);
+plot(ln_HCHO_a_290, y_values, 'r-','LineWidth',1.5);
+legend('Data Points', 'Linear Fit');
+title("5% Oxygen, ln(HCHO) vs ln(rate of CO) at 290C")
+hold off
+%R^2 value 
+mdl = fitlm(y_values,ln_R_CO_a_290);           % X predictors, y response
+eqn2_a_290_rsquared = mdl.Rsquared.Ordinary
+
+%data set b
+%rate with constant HCOH vs O2
+%HCOH at 3.5% concentration 
+%290 degrees
+O2_b_290 = [1.12012987 1.899350649 3.043831169 3.993506494 5.089285714 10.08116883 14.75649351];
+
+R_CO_b_290 = 10^-3 .*[0.120923913 0.151494565 0.161005435 0.171195652 0.180706522 0.203125 0.222826087];
+
+ln_O2_b_290 = log(O2_b_290);
+ln_R_CO_b_290 = log(R_CO_b_290);
+figure("Name","Reaction Order of O2 (290C)")
+scatter(ln_O2_b_290,ln_R_CO_b_290,'x',"SizeData",100,"LineWidth",2);
+xlabel("ln(concentration of O2)")
+ylabel("ln(Rate of CO formation)")
+hold on
+coeff_b_290 = polyfit(ln_O2_b_290,ln_R_CO_b_290,1);
+y_values = polyval(coeff_b_290, ln_O2_b_290);
+plot(ln_O2_b_290, y_values, 'r-','LineWidth',1.5);
+legend('Data Points', 'Linear Fit');
+title("3.5% Formalaldehyde, ln(O2) vs ln(rate of CO) at 290C")
+%R^2 value 
+mdl = fitlm(y_values,ln_R_CO_b_290);           % X predictors, y response
+eqn2_b_290_rsquared = mdl.Rsquared.Ordinary
+
+eqn2_HCHO_order_290 = coeff_a_290(1)
+eqn2_O2_order_290 = coeff_b_290(1)
+
+eqn2_HCHO_order = (eqn2_HCHO_order_290+eqn2_HCHO_order_250)/2
+eqn2_O2_order = (eqn2_O2_order_250 + eqn2_O2_order_290)/2
+%------------------------------------------------------------
+%-----------------------250 degrees--------------------------
+T = 250 + 273.15;
 %------------------------------------------------------
+%Concentration of HCHO vs Rate of CO
 %using rate equation to plot (data set a)
 k2_250c = 2.36943E-05;
-figure(3)
+figure("Name","Concentration of HCHO vs Rate of CO")
 HCHO_values = linspace(0,7,100);
 R_CO_a_predicted = k2_250c .* HCHO_values.^eqn2_HCHO_order .* 5.^eqn2_O2_order;
-plot(HCHO_values,R_CO_a_predicted)
+plot(HCHO_values,R_CO_a_predicted,'LineWidth',1.5)
 hold on 
 
 %dataset a - experimental data
-scatter(HCHO_a,R_CO_a,'x')
+scatter(HCHO_a_250,R_CO_a_250,'x',"SizeData",100,"LineWidth",2)
 
 %dataset a - LHHM kinetics
  nom2 = alpha*kCO.*HCHO_values/100*KO2*(sqrt(0.05));
     den2 = 1 + KO2*(sqrt(0.05));
     r2 = nom2 ./ den2;
-plot(HCHO_values,r2)
+plot(HCHO_values,r2,'LineWidth',1.5)
 legend(["Simple Power Law Kinetics - Prediction","Experimental Data","LHHM Kinetics - Prediction"])
 xlabel("Concentration of HCHO")
 ylabel("Rate of formation of CO")
-title("5% Oxygen, HCHO conc. vs rate of CO")
+title("5% Oxygen, HCHO conc. vs rate of CO (250C)")
 hold off
 
 %----------------------------------------------------------
 %using rate equation to plot (data set b)
-figure(4)
+figure("Name","Concentration of O2 vs Rate of CO")
 o2_values = linspace(0,15,100);
 R_CO_b_predicted = k2_250c .* 3.5.^eqn2_HCHO_order .* o2_values.^eqn2_O2_order;
-plot(o2_values,R_CO_b_predicted)
+plot(o2_values,R_CO_b_predicted,'LineWidth',1.5)
 hold on 
 %data set b - experimental data
-scatter(O2_b,R_CO_b,'x')
+scatter(O2_b_250,R_CO_b_250,'x',"SizeData",100,"LineWidth",2)
 %data set b - LHHM kinetics
 nom2 = alpha*kCO*3.5/100*KO2.*((o2_values/100).^0.5);
     den2 = 1 + KO2.*((o2_values/100).^0.5);
     r2 = nom2 ./ den2;
 
-plot(o2_values,r2)
+plot(o2_values,r2,'LineWidth',1.5)
 legend(["Simple Power Law Kinetics - Prediction","Experimental Data","LHHM Kinetics - Prediction"])
 xlabel("Concentration of O2")
 ylabel("Rate of formation of CO")
-title("3.5% Formalaldehyde, O2 conc. vs rate of CO")
+title("3.5% Formalaldehyde, O2 conc. vs rate of CO (250C)")
+
+%------------------------------------------------------------
+%-----------------------290 degrees--------------------------
+T = 290 + 273.15;
+
+    % --- Calculation of rate constants from params --- %
+    kCH3OH = A_kCH3OH * exp(-Ea_kCH3OH/(R*T));
+    KCH3OH = A_KCH3OH * exp(-Ea_KCH3OH/(R*T));
+    KO2    = A_KO2    * exp(-Ea_KO2/(R*T));
+    KH2O   = A_KH2O   * exp(-Ea_KH2O/(R*T));
+    kCO    = A_kCO    * exp(-Ea_kCO/(R*T));
+%------------------------------------------------------
+%Concentration of HCHO vs Rate of CO
+%using rate equation to plot (data set a)
+k2_290c = 0.042843899/1000;
+figure("Name","Concentration of HCHO vs Rate of CO (290C)")
+HCHO_values = linspace(0,7,100);
+R_CO_a_predicted = k2_290c .* HCHO_values.^eqn2_HCHO_order .* 5.^eqn2_O2_order;
+plot(HCHO_values,R_CO_a_predicted,'LineWidth',1.5)
+hold on 
+
+%dataset a - experimental data
+scatter(HCHO_a_290,R_CO_a_290,'x',"SizeData",100,"LineWidth",2)
+
+%dataset a - LHHM kinetics
+ nom2 = alpha*kCO.*HCHO_values/100*KO2*(sqrt(0.05));
+    den2 = 1 + KO2*(sqrt(0.05));
+    r2 = nom2 ./ den2;
+plot(HCHO_values,r2,'LineWidth',1.5)
+legend(["Simple Power Law Kinetics - Prediction","Experimental Data","LHHM Kinetics - Prediction"])
+xlabel("Concentration of HCHO")
+ylabel("Rate of formation of CO")
+title("5% Oxygen, HCHO conc. vs rate of CO (290C)")
+hold off
+
+%----------------------------------------------------------
+%using rate equation to plot (data set b)
+figure("Name","Concentration of O2 vs Rate of CO (290C)")
+o2_values = linspace(0,15,100);
+R_CO_b_predicted = k2_290c .* 3.5.^eqn2_HCHO_order .* o2_values.^eqn2_O2_order;
+plot(o2_values,R_CO_b_predicted,'LineWidth',1.5)
+hold on 
+%data set b - experimental data
+scatter(O2_b_290,R_CO_b_290,'x',"SizeData",100,"LineWidth",2)
+%data set b - LHHM kinetics
+nom2 = alpha*kCO*3.5/100*KO2.*((o2_values/100).^0.5);
+    den2 = 1 + KO2.*((o2_values/100).^0.5);
+    r2 = nom2 ./ den2;
+
+plot(o2_values,r2,'LineWidth',1.5)
+legend(["Simple Power Law Kinetics - Prediction","Experimental Data","LHHM Kinetics - Prediction"])
+xlabel("Concentration of O2")
+ylabel("Rate of formation of CO")
+title("3.5% Formalaldehyde, O2 conc. vs rate of CO (290C)")
