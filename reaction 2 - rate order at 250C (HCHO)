@@ -1,0 +1,26 @@
+clf
+clear
+clc
+
+%rate with constant O2 vs HCOH
+%oxygen at 5% concentration 
+%250 degrees
+HCHO_a = [0.764044944 1.382022472 2.303370787 2.820224719 3.04494382 3.06741573 4.078651685 5.191011236 6.168539326];
+
+R_CO_a = [0.06282318 0.089151381 0.131491618 0.154381809 0.161262098 0.184058389 0.245788918 0.289305035 0.31912033];
+
+ln_HCHO_a = log(HCHO_a);
+ln_R_CO_a = log(R_CO_a);
+
+scatter(ln_HCHO_a,ln_R_CO_a);
+xlabel("ln(concentration of HCHO)")
+ylabel("ln(Rate of CO formation)")
+hold on
+order_HCHO_250c = polyfit(ln_HCHO_a,ln_R_CO_a,1)
+y_values = polyval(order_HCHO_250c, ln_HCHO_a);
+plot(ln_HCHO_a, y_values, 'r-');
+legend('Data Points', 'Linear Fit');
+%R^2 value 
+mdl = fitlm(y_values,ln_R_CO_a);           % X predictors, y response
+R2 = mdl.Rsquared.Ordinary
+R2adj = mdl.Rsquared.Adjusted
