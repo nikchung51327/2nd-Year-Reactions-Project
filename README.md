@@ -1,1 +1,3 @@
-# ChemE_rxn_proj
+# 2nd Year Reactions Project
+
+Theo, Keo, Seung Hwan, Yejoo, Nikolas
