@@ -8,6 +8,6 @@ FIGURES
 Step 2 
 reaction 1 - 
 
-reaction 2 - 6 graphs 
+reaction 2 - 8 graphs 
 
 Step 3 
