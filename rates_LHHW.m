@@ -1,4 +1,15 @@
 function [r1, r2] = rates_LHHW(T, alpha, P_CH3OH, P_O2, P_H20, P_HCHO)
+    
+    % --- Inputs:
+    %
+    % T ~ Temperature [K]
+    % alpha ~ Fraction of the mass of catalyst containing the catalytic compounds
+    % P_i ~ Partial pressures of each component [atm]
+    %
+    % --- Outputs:
+    %
+    % r1 ~ rate of partial oxidation of ethanol [mol/(kg*s)]
+    % r2 ~ rate of partial oxidation of carbon monoxide [mol/(kg*s)]
 
     R = 8.314; % J/mol/K
     
@@ -16,12 +27,12 @@ function [r1, r2] = rates_LHHW(T, alpha, P_CH3OH, P_O2, P_H20, P_HCHO)
     KH2O   = A_KH2O   * exp(-Ea_KH2O/(R*T));
     kCO    = A_kCO    * exp(-Ea_kCO/(R*T));
     
-    % --- R1
+    % --- r1
     nom1 = alpha*kCH3OH*KCH3OH*P_CH3OH*KO2*(sqrt(P_O2));
     den1 = (1+KCH3OH*P_CH3OH + KH2O*P_H20) + (1 + KO2*(sqrt(P_O2)));
     r1 = nom1 / den1;
 
-    % --- R2
+    % --- r2
     nom2 = alpha*kCO*P_HCHO*KO2*(sqrt(P_O2));
     den2 = 1 + KO2*(sqrt(P_O2));
     r2 = nom2 / den2;
