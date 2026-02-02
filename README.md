@@ -7,6 +7,7 @@ FIGURES
 
 Step 2 
 reaction 1 - 
-reaction 2 - 4 graphs 
+
+reaction 2 - 6 graphs 
 
 Step 3 
