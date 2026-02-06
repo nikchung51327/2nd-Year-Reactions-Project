@@ -27,14 +27,14 @@ function [r1, r2] = rates_LHHW(T, alpha, P_CH3OH, P_O2, P_H20, P_HCHO)
     KH2O   = A_KH2O   * exp(-Ea_KH2O/(R*T));
     kCO    = A_kCO    * exp(-Ea_kCO/(R*T));
     
+    P_O2 = sqrt(max(P_O2, 0));
     % --- r1
-    nom1 = alpha*kCH3OH*KCH3OH*P_CH3OH*KO2*(sqrt(P_O2));
-    den1 = (1+KCH3OH*P_CH3OH + KH2O*P_H20) + (1 + KO2*(sqrt(P_O2)));
+    nom1 = alpha*kCH3OH*KCH3OH*P_CH3OH*KO2*(P_O2);
+    den1 = (1+KCH3OH*P_CH3OH + KH2O*P_H20)*(1 + KO2*(P_O2));
     r1 = nom1 / den1;
 
     % --- r2
-    nom2 = alpha*kCO*P_HCHO*KO2*(sqrt(P_O2));
-    den2 = 1 + KO2*(sqrt(P_O2));
+    nom2 = alpha*kCO*P_HCHO*KO2*(P_O2);
+    den2 = 1 + KO2*(P_O2);
     r2 = nom2 / den2;
-
 end

@@ -10,7 +10,7 @@ function P_i = partial_pressures(F_i, Ptot)
     %
     % P_i ~ Partial pressure of each component [atm]
 
-    Ftot = sum(F);
+    Ftot = sum(F_i);
 
     y_i = F_i ./ Ftot;
     P_i = y_i .* Ptot;
