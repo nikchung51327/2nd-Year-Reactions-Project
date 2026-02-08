@@ -1,0 +1,47 @@
+function dFdW = odes_rxny2_t3(W, f, T, alpha, kinetics, Ptot)
+
+    % --- Inputs:
+    %
+    % F_i ~ Flowrate of each component [mol/s]
+    % P_tot ~ Total pressure [atm]
+    %
+    % --- Outputs:
+    %
+    % dFdW ~ ODEs for each component: d(flow rate [mol/s])/d(weight of catalyst[kg])
+    if W == 0
+    disp('Fi ='); disp(f(1:6)')
+    disp('sum Fi ='); disp(sum(f(1:6)))
+    disp('yi ='); disp(f(1:6)'/sum(f(1:6)))
+    end
+
+    F_i = f(1:6);
+
+    P_i = partial_pressures(F_i, Ptot);
+    
+    % --- Extract partial pressures, order matters from order of flowrates given
+    P_CH3OH = P_i(1);
+    P_O2 = P_i(2);
+    P_H2O = P_i(3);
+    P_HCHO = P_i(4);
+   
+    switch kinetics
+        case "LHHW"
+            [r1, r2] = rates_LHHW(T, alpha, P_CH3OH, P_O2, P_H2O, P_HCHO);
+        
+        case "POWER"
+            [r1, r2] = rates_POWER();
+    end
+
+    dF_CH3OH = -r1;
+    dF_O2 = -0.5*r1 - 0.5*r2;
+    dF_HCHO = r1 - r2;
+    dF_H2O = r1 + r2;
+    dF_CO = r2;
+    dF_N2 = 0;
+
+    d_extent1 = r1;
+    d_extent2 = r2;
+
+    dFdW = [dF_CH3OH; dF_O2; dF_H2O; dF_HCHO; dF_CO; dF_N2; d_extent1; d_extent2];
+    
+end
