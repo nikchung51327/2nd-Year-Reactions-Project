@@ -1,0 +1,117 @@
+n_T_in= 35.11;
+
+n_ch3oh_in = 0.11*n_T_in;
+n_o2_in = 0.06*n_T_in;
+n_hcho_in = 0;
+n_h2o_in = 0.02 * n_T_in;
+n_co_in = 0;
+n_n2_in = 0.81 * n_T_in;
+P_in = 1.579;
+
+y0 =[n_ch3oh_in, n_o2_in, n_hcho_in, n_h2o_in, n_co_in, n_n2_in, P_in]; %initial conditions for ODE: the 0 states that there is no hcho
+zspan = [0, 10]; %the ode solver will integrate from 0 to 10 m
+option = odeset('Events', @stopEvents); % This stops integrating at a z which we dont know where physical boundaries will tell it to stop
+
+[z, y] = ode45(@reactorODE, zspan, y0)%ODE solver
+%%
+function dni_dz = reactorODE(z, y)
+
+n_ch3oh = y(1);
+n_o2 = y(2);
+n_hcho = y(3);
+n_h2o = y(4);
+n_co = y(5);
+n_n2 = y(6);
+P = y(7);
+%%%% DEFINING CONSTANTS
+
+P_in = 1.579; %Pressure in atm
+n_T_in = 35.11; % number of moles coming in mol.s-1 on basis: 1 kg.s-1=35.11 mol.s-1
+m_flowrate = 1; %kg.s-1
+alpha = 0.44;
+rho_cat = 1500; %in kg/m^3
+bed_voidage = 0.4;
+R = 8.314; % gas constant J.K-1.mol-1
+T = 430; %Temperature in Kelvin 
+A = 3.14*10^-4; %Area of the tube in m^2
+D_p = 7.04 *10^-3; %the equivalent particle diameter
+G = m_flowrate/A;  %superficial mass velocity of the fluid
+
+% Molar masses of each component g.mol-1
+Mr_ch3oh = 32.042;
+Mr_o2 = 32.00;
+Mr_hcho = 30.026;
+Mr_h2o = 18.00;
+Mr_co = 28;
+Mr_n2 = 28.014;
+
+n_T = n_ch3oh + n_o2 + n_hcho + n_h2o + n_co + n_n2; %total flowrate at times t
+
+% Defining Composition of components
+
+x_ch3oh = n_ch3oh/n_T;
+x_o2 = n_o2/n_T;
+x_hcho = n_hcho/n_T;
+x_h2o = n_h2o/n_T;
+x_co = n_co/n_T;
+x_n2 = n_n2/n_T;
+
+Mr_total = x_ch3oh*Mr_ch3oh + x_o2*Mr_o2 + x_hcho*Mr_hcho + x_h2o*Mr_h2o + x_co*Mr_co + x_n2*Mr_n2;
+
+a_ch3oh =1.50 * 10^7; %in mol/kg.s
+A_ch3oh = 2.60 * 10^-4; %in atm^-1
+A_o2 = 1.42*10^-5; %atm^-1/2
+A_h2o = 5.550*10^-7;
+a_co = 3.50*10^2; %mol.kg-1.atm-1.s-1
+
+%Activation Energies
+
+Ea1 = 86*10^3;% all are in J.mol-1
+Ea2 = -56.78*10^3;
+Ea3 = -60.32*10^3;
+Ea4 = -85.45*10^3;
+Ea5 = 46.00*10^3;
+
+k = [a_ch3oh, A_ch3oh, A_o2, A_h2o, a_co].* exp(-[Ea1, Ea2, Ea3, Ea4, Ea5] ./ (R*T));% calculating K constants
+
+k_ch3oh = k(1);
+K_ch3oh = k(2);
+K_o2    = k(3);
+K_h2o   = k(4);
+k_co    = k(5);
+
+rho_mix = (P*Mr_total)/(R*T);
+
+% Defining Partial Pressures
+
+P_ch3oh = n_ch3oh * (P/n_T);%in atm since P_in is in atm
+P_o2 = n_o2 * (P/n_T);
+P_h2o = n_h2o * (P/n_T);
+P_hcho = n_hcho * (P/n_T);
+
+% Defining rates of reaction 1 and reaction 2
+
+R1 = (alpha*k_ch3oh*K_ch3oh*P_ch3oh*K_o2*(P_o2)^(1/2))/((1+K_ch3oh*P_ch3oh+K_h2o*P_h2o)*(1+K_o2*(P_o2)^(1/2)));
+
+R2 = (alpha*k_co*P_hcho*K_o2*(P_o2)^(1/2))/(1+K_o2*(P_o2)^(1/2));
+
+% Equations
+
+dn_ch3oh_dz = -rho_cat*(1-bed_voidage)*A*R1;
+
+dn_o2_dz = -rho_cat*(1-bed_voidage)*A*((1/2)*R1+(1/2)*R2);
+
+dn_hcho_dz = rho_cat*(1-bed_voidage)*A*(R1-R2);
+
+dn_h2o_dz = rho_cat*(1-bed_voidage)*A*(R1+R2);
+
+dn_co_dz = rho_cat*(1-bed_voidage)*A*R2;
+
+dn_n2_dz = 0;
+
+dP_dz = -(1.75 * G^2 * (1 - bed_voidage)) / (D_p * rho_mix * bed_voidage^3) * 9.86923e-6; %multiplied by 9,86923e-6 because 1 pa = 9,86923e-6 atm
+
+%collecting all in one
+
+dni_dz = [dn_ch3oh_dz; dn_o2_dz; dn_hcho_dz; dn_h2o_dz; dn_co_dz; dn_n2_dz; dP_dz];
+end
