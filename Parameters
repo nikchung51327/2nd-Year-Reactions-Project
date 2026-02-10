@@ -1,0 +1,50 @@
+clear; clc;
+
+% ---------- Physical constants ----------
+R = 8.314;       % J/mol/K
+alpha = 0.44;
+
+% ---------- Temperatures (K) ----------
+T250 = 250 + 273.15;
+T290 = 290 + 273.15;
+
+% ---------- Arrhenius parameters ----------
+A_kCH3OH = 1.50e7;    Ea_kCH3OH = 86.00e3;
+A_KCH3OH = 2.60e-4;   Ea_KCH3OH = -56.78e3;
+A_KO2    = 1.42e-5;   Ea_KO2    = -60.32e3;
+A_KH2O   = 5.50e-7;   Ea_KH2O   = -86.45e3;
+A_kCO    = 3.50e2;    Ea_kCO    = 46.00e3;
+
+% ---------- Compute constants using function ----------
+[kCH3OH_250, KCH3OH_250, KO2_250, KH2O_250, kCO_250] = getKs(T250);
+[kCH3OH_290, KCH3OH_290, KO2_290, KH2O_290, kCO_290] = getKs(T290);
+
+
+% --- Reaction orders (from regression) ---
+eqn2_HCHO_order_250 = 0.9120;
+eqn2_O2_order_250   = 0.2104;
+
+eqn2_HCHO_order_290 = 0.8150;
+eqn2_O2_order_290   = 0.2194;
+
+eqn2_HCHO_order = (eqn2_HCHO_order_290 + eqn2_HCHO_order_250)/2;
+eqn2_O2_order   = (eqn2_O2_order_250 + eqn2_O2_order_290)/2;
+%---------------------------------------------------------------------------------------------------
+% Molar masses of each component kg.mol-1
+Mr_CH3OH = 32.042e-3;
+Mr_O2 = 32.00e-3;
+Mr_HCHO = 30.026e-3;
+Mr_H2O = 18.00e-3;
+Mr_CO = 28e-3;
+Mr_N2 = 28.014e-3;
+% mol fractions;
+y0_CH3OH = 0.11; 
+y0_O2 = 0.06; 
+y0_H2O = 0.02; 
+y0_HCHO = 0; 
+y0_CO = 0;
+y0_N2 = 0.81; 
+
+% finding total flowrate [mol/s] given inlet mass flowrate [kg/s].
+m_flowrate = 0.001;
+nT0 = (mT0)/(y0_CH3OH*Mr_CH3OH+y0_O2*Mr_O2+y0_H2O*Mr_H2O+y0_N2*Mr_N2);
