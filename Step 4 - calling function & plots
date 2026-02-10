@@ -1,0 +1,61 @@
+%main function 
+
+
+% mol fractions;
+y0_CH3OH = 0.11; 
+y0_O2 = 0.06; 
+y0_H2O = 0.02; 
+y0_HCHO = 0; 
+y0_CO = 0;
+y0_N2 = 0.81; 
+
+nT0 = 100;
+
+n0_CH3OH = y0_CH3OH*nT0; 
+n0_O2 = y0_O2*nT0;
+n0_H2O = y0_H2O*nT0;
+n0_HCHO = y0_HCHO*nT0; 
+n0_CO = y0_CO*nT0;
+n0_N2 = y0_N2*nT0;
+extent_1 = 0;
+extent_2 = 0;
+
+F0 = [n0_CH3OH, n0_O2, n0_HCHO, n0_H2O, n0_CO, n0_N2,extent_1,extent_2,1.6];
+
+
+% Solve the ODE
+% Solve the ODE using ode15s (stiff solver)
+options = odeset('RelTol', 1e-6, 'AbsTol', 1e-9);
+[z_points, F_values] = ode15s(@step4_reactor, [0 1], F0, options);
+F_values = F_values';  % Transpose to match your indexing (rows = variables, cols = points)
+
+
+
+F_CH3OH = F_values(1, :);
+F_O2 = F_values(2, :);
+F_HCHO = F_values(3, :);
+F_H2O = F_values(4, :);
+F_CO = F_values(5, :);
+F_N2 = F_values(6, :);
+
+% Plot
+figure;
+plot(z_points, F_CH3OH, 'b-', 'LineWidth', 2); hold on;
+plot(z_points, F_O2, 'r-', 'LineWidth', 2);
+plot(z_points, F_HCHO, 'g-', 'LineWidth', 2);
+plot(z_points, F_H2O, 'c-', 'LineWidth', 2);
+plot(z_points, F_CO, 'm-', 'LineWidth', 2);
+xlabel('Reactor Length (m)');
+ylabel('Molar Flow Rate (mol/s)');
+legend('CH3OH', 'O2', 'HCHO', 'H2O', 'CO');
+grid on;
+
+figure("Name","Extent Of reaction")
+extent1 = F_values(7,:);
+extent2 = F_values(8,:);
+plot(z_points, extent1, 'b-', 'LineWidth', 2); hold on;
+plot(z_points, extent2, 'r-', 'LineWidth', 2);
+
+P = F_values(9,:);
+figure
+plot(z_points, P)
