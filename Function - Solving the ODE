@@ -48,7 +48,7 @@ function [z_points, F_CH3OH, F_O2, F_HCHO, F_H2O, F_CO, F_N2, extent1, extent2, 
 
     % --- Solve ODE --- %
     opts = odeset('RelTol', 1e-6, 'AbsTol', 1e-9);
-    [z_points, solution] = ode15s(@(z, F) step4_reactor(z, F, options), [0 reactor_length], initial_conditions, opts);
+    [z_points, solution] = ode15s(@(z, F) reactor(z, F, options), [0 reactor_length], initial_conditions, opts);
     solution = solution';
 
     %output
