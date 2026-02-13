@@ -1,0 +1,85 @@
+function [z_points, F_CH3OH, F_O2, F_HCHO, F_H2O, F_CO, F_N2, extent1, extent2, P, T] = solve_reactor(m_flowrate,reactor_length,P0,T0,options)
+
+
+    % --- Inputs:
+    % m_flowrate [kg/s]
+    % option array
+    % Kinetic_type = "LHHW" or "Simple Power";
+    % Pressure_drop = "Yes" or "No";
+    % Temp_dependence = "Yes" or "No";
+
+
+    % --- Molar masses [kg/mol] --- %
+    Mr_CH3OH = 32.042e-3;
+    Mr_O2    = 32.00e-3;
+    Mr_H2O   = 18.00e-3;
+    Mr_N2    = 28.014e-3;
+
+    % --- Inlet mol fractions --- %
+    y0_CH3OH = 0.11;
+    y0_O2    = 0.06;
+    y0_H2O   = 0.02;
+    y0_HCHO  = 0;
+    y0_CO    = 0;
+    y0_N2    = 0.81;
+
+    % --- Initial molar flow rates [mol/s] --- %
+    nT0 = m_flowrate / (y0_CH3OH*Mr_CH3OH + y0_O2*Mr_O2 + y0_H2O*Mr_H2O + y0_N2*Mr_N2);
+
+    n0_CH3OH = y0_CH3OH * nT0;
+    n0_O2    = y0_O2    * nT0;
+    n0_H2O   = y0_H2O   * nT0;
+    n0_HCHO  = y0_HCHO  * nT0;
+    n0_CO    = y0_CO    * nT0;
+    n0_N2    = y0_N2    * nT0;
+    
+    %Initial Condition Array
+    %1 - CH3OH flowrate
+    %2 - O2 flowrate
+    %3 - HCHO flowrate
+    %4 - H2O flowrate
+    %5 - CO flowrate
+    %6 - N2 flowrate
+    %7 - Extent of reaction 1
+    %8 - Extent of reaction 2
+    %9 - Pressure 
+    %10 - Temperature 
+    initial_conditions = [n0_CH3OH, n0_O2, n0_HCHO, n0_H2O, n0_CO, n0_N2, 0, 0, P0, T0];
+
+    % --- Solve ODE --- %
+    opts = odeset('RelTol', 1e-6, 'AbsTol', 1e-9);
+    [z_points, solution] = ode15s(@(z, F) step4_reactor(z, F, options), [0 reactor_length], initial_conditions, opts);
+    solution = solution';
+
+    %output
+    F_CH3OH = solution(1, :);
+    F_O2    = solution(2, :);
+    F_HCHO  = solution(3, :);
+    F_H2O   = solution(4, :);
+    F_CO    = solution(5, :);
+    F_N2    = solution(6, :);
+    extent1 = solution(7, :);
+    extent2 = solution(8, :);
+    P = solution(9,:);
+    T = solution(10,:);
+
+end
+
+
+%---------------------------------------------------------- 
+%------------------ONLY INPUT HERE-------------------------
+%----------------------------------------------------------
+m_flowrate = 0.001;
+reactor_length = 5;
+P0 = 1.6; %Initial Pressure [bar]
+T0 = 523; %Initial Temperature [K]
+Kinetic_type = "LHHW";
+Pressure_drop = "Yes";
+Temp_dependence = "No";
+%----------------------------------------------------------
+%----------------------------------------------------------
+%----------------------------------------------------------
+
+option = [Kinetic_type Pressure_drop Temp_dependence];
+
+[z_points, F_CH3OH, F_O2, F_HCHO, F_H2O, F_CO, F_N2, extent1, extent2, P, T]= solve_reactor(m_flowrate,reactor_length,P0,T0,option);
