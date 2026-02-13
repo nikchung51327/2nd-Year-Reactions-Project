@@ -1,0 +1,120 @@
+function dni_dz = reactor(t,F,options)
+
+if F(9) <= 0.01  % If pressure too low
+    fprintf('WARNING: Pressure too low at z=%.2f, P=%.4f\n', t, F(9));
+    dni_dz = zeros(10,1);
+    return;
+end
+
+% Check for negative molar flows
+if any(F(1:6) < 0)
+    fprintf('WARNING: Negative flows at z=%.2f\n', t);
+    dni_dz = zeros(10,1);
+    return;
+end
+
+
+%parameters
+rho_cat = 1500; %kg m^-3
+bed_voidage = 0.4;
+%
+R = 8.314;
+D_p = 7.04 *10^-3;
+%alpha
+alpha = 0.44;
+% Molar masses of each component kg.mol-1
+Mr_CH3OH = 32.042e-3;
+Mr_O2 = 32.00e-3;
+Mr_HCHO = 30.026e-3;
+Mr_H2O = 18.00e-3;
+Mr_CO = 28e-3;
+Mr_N2 = 28.014e-3;
+
+% tube diameter [m]; 
+tube_diameter = 20 * 10^-3;
+
+A = pi*(tube_diameter/2)^2;
+
+%defining each variable 
+n_CH3OH = F(1);
+n_O2 = F(2);
+n_HCHO = F(3);
+n_H2O = F(4);
+n_CO = F(5);
+n_N2 = F(6);
+extent_1 = F(7);
+extent_2 = F(8);
+P = F(9);
+P_pascal = P * 101325;% Convert pressure from atm to pascal
+T = F(10);
+
+%total molar flowrate
+n_T = n_CH3OH + n_O2 + n_HCHO + n_H2O + n_CO + n_N2;
+
+%mol fraction
+y_CH3OH = n_CH3OH / n_T;
+y_O2 = n_O2 / n_T;
+y_H2O = n_H2O / n_T;
+y_HCHO = n_HCHO / n_T;
+y_CO = n_CO/n_T;
+y_N2 = n_N2/ n_T;
+%partial pressures 
+P_CH3OH = y_CH3OH * P; 
+P_O2 = y_O2 * P; 
+P_H20 = y_H2O * P; 
+P_HCHO = y_HCHO * P;
+P_CO = y_CO * P;
+P_N2 = y_N2 * P;
+
+Mr_total = y_CH3OH*Mr_CH3OH + y_O2*Mr_O2 + y_H2O*Mr_H2O + y_HCHO*Mr_HCHO + y_CO*Mr_CO + y_N2*Mr_N2;
+
+m_flowrate = Mr_total*n_T;
+%G (superficial mass velocity)
+G = m_flowrate/A;  %superficial mass velocity of the fluid
+rho_mix = (P_pascal*Mr_total)/(R*T);
+
+
+dw_dz = rho_cat*(1-bed_voidage)*A;
+
+%Pressure Drop - Yes or No
+if options(2) == "Yes"
+    %Ergun Equation 
+    dP_dz = -(1.75*(G^2)*(1-bed_voidage))/(D_p*rho_mix*(bed_voidage)^3);
+    dP_dz = dP_dz / 101325;  % convert Pa/m to atm/m
+end 
+if options(2) == "No"
+    dP_dz = 0;
+end 
+
+%Isothermal - Yes or No
+if options(3) == "Yes"
+    %energy balance
+    %Please help I cba 
+end 
+if options(3) == "No"
+    dT_dz = 0;
+end 
+
+
+%rates 
+if options(1) == "LHHW"
+    [r1, r2] = rates_LHHW(T, alpha, P_CH3OH, P_O2, P_H20, P_HCHO);
+end 
+if options(1) == "Simple Power"
+    [r1, r2] = rates_powerlaw(T, y_CH3OH, y_O2, y_HCHO, y_H2O);
+end 
+
+dn_CH3OH_dz = -r1*dw_dz;
+dn_O2_dz = -(r1+r2)/2*dw_dz;
+dn_HCHO_dz = (r1-r2)*dw_dz;
+dn_H2O_dz = (r1+r2)*dw_dz; 
+dn_CO_dz = r2*dw_dz; 
+dn_N2_dz = 0; % Assuming no change in N2 concentration
+d_extent1_dz = A*r1;
+d_extent2_dz = A*r2;
+
+
+dni_dz = [dn_CH3OH_dz; dn_O2_dz; dn_HCHO_dz; dn_H2O_dz; dn_CO_dz; dn_N2_dz; d_extent1_dz; d_extent2_dz; dP_dz; dT_dz];
+
+
+end 
