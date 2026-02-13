@@ -1,0 +1,58 @@
+function dni_dz = step3_reactor(t,F,options)
+
+%parameters
+rho_cat = 1500; %kg m^-3
+bed_voidage = 0.4;
+%temperature
+T = 523;
+%pressure
+P = 1.6;
+%alpha
+alpha = 0.44;
+
+
+% tube diameter [m]; 
+tube_diameter = 20 * 10^-3;
+
+A = pi*(tube_diameter/2)^2;
+
+%defining each variable 
+n_CH3OH = F(1);
+n_O2 = F(2);
+n_HCHO = F(3);
+n_H2O = F(4);
+n_CO = F(5);
+n_N2 = F(6);
+extent_1 = F(7);
+extent_2 = F(8);
+
+%mol fraction
+y_CH3OH = n_CH3OH / (n_CH3OH + n_O2 + n_HCHO + n_H2O + n_CO + n_N2);
+y_O2 = n_O2 / (n_CH3OH + n_O2 + n_HCHO + n_H2O + n_CO + n_N2);
+y_H2O = n_H2O / (n_CH3OH + n_O2 + n_HCHO + n_H2O + n_CO + n_N2);
+y_HCHO = n_HCHO / (n_CH3OH + n_O2 + n_HCHO + n_H2O + n_CO + n_N2);
+%partial pressures 
+P_CH3OH = y_CH3OH * P; 
+P_O2 = y_O2 * P; 
+P_H20 = y_H2O * P; 
+P_HCHO = y_HCHO * P;
+
+dw_dz = rho_cat*(1-bed_voidage)*A;
+
+if options == "LHHW"
+    [r1, r2] = rates_LHHW(T, alpha, P_CH3OH, P_O2, P_H20, P_HCHO);
+end 
+if options == "Simple Power"
+    [r1, r2] = rates_powerlaw(T, y_CH3OH, y_O2, y_HCHO, y_H2O);
+end 
+
+dn_CH3OH_dz = -r1*dw_dz;
+dn_O2_dz = -(r1+r2)/2*dw_dz;
+dn_HCHO_dz = (r1-r2)*dw_dz;
+dn_H2O_dz = (r1+r2)*dw_dz; 
+dn_CO_dz = r2*dw_dz; 
+dn_N2_dz = 0; % Assuming no change in N2 concentration
+d_extent1_dz = A*r1;
+d_extent2_dz = A*r2;
+dni_dz = [dn_CH3OH_dz; dn_O2_dz; dn_HCHO_dz; dn_H2O_dz; dn_CO_dz; dn_N2_dz; d_extent1_dz; d_extent2_dz];
+end 
