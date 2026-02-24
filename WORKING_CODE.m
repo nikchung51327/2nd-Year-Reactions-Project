@@ -92,6 +92,37 @@ function [r1, r2] = rates_powerlaw(T, P_CH3OH, P_O2, P_HCHO)
 
 end
 
+function dT_dz = energy_bal(r1, r2, y, n_T, T)
+
+    % Enthalpy of reaction at 298K kJ/mol
+    Hr1 = -159*10^3;
+    Hr2 = -200*10^3;
+
+    % tube diameter [m]; 
+    tube_diameter = 20 * 10^-3;
+
+    A = pi*(tube_diameter/2)^2;
+    
+    species = {'CH3OH'; 'O2'; 'H2O'; 'N2'; 'HCHO'; 'CO'};
+    a = [40.0460; 29.5260; 33.9330; 29.3420; 29.6750; 29.5560];
+    b = [-3.8287e-02; -8.8999e-03; -8.4186e-03; -3.5395e-03;  1.8937e-02; -6.5807e-03];
+    c = [ 2.4529e-04;  3.8083e-05;  2.9906e-05;  1.0076e-05;  2.8739e-05;  2.0130e-05];
+    d = [-2.1679e-07; -3.2629e-08; -1.7825e-08; -4.3116e-09; -2.0092e-08; -1.2227e-08];
+    e = [ 5.9909e-11;  8.8607e-12;  3.6934e-12;  2.5935e-13;  3.4333e-12;  2.2617e-12];
+    
+    y_Cp = zeros(6,1); % y*Cp
+    
+    for i = 1:6
+    y_Cp(i) = y(i)*(a(i)* + b(i)*T^1 + c(i)*T^2 + d(i)*T^3 + e(i)*T^4);
+    end
+    
+    sum_y_Cp = sum(y_Cp); 
+    num = - (r1*Hr1 + r2*Hr2)*A;
+    den = n_T*sum_y_Cp;
+    
+    dT_dz = num / den;
+end
+
 function dni_dz = reactor(t,F,options)
 
 
@@ -150,9 +181,12 @@ n_T = n_CH3OH + n_O2 + n_HCHO + n_H2O + n_CO + n_N2;
 y_CH3OH = n_CH3OH / n_T;
 y_O2 = n_O2 / n_T;
 y_H2O = n_H2O / n_T;
+y_N2 = n_N2/ n_T;
 y_HCHO = n_HCHO / n_T;
 y_CO = n_CO/n_T;
-y_N2 = n_N2/ n_T;
+
+
+y = [y_CH3OH; y_O2; y_H2O; y_N2; y_HCHO; y_CO];
 %partial pressures 
 P_CH3OH = y_CH3OH * P; 
 P_O2 = y_O2 * P; 
@@ -181,15 +215,6 @@ if options(2) == "No"
     dP_dz = 0;
 end 
 
-%Isothermal - Yes or No
-if options(3) == "Yes"
-    %energy balance
-    %Please help I cba 
-end 
-if options(3) == "No"
-    dT_dz = 0;
-end 
-
 
 %rates 
 if options(1) == "LHHW"
@@ -197,6 +222,14 @@ if options(1) == "LHHW"
 end 
 if options(1) == "Simple Power"
     [r1, r2] = rates_powerlaw(T, y_CH3OH, y_O2, y_HCHO, y_H2O);
+end 
+
+%Isothermal - Yes or No
+if options(3) == "Yes"
+    dT_dz = energy_bal(r1, r2, y, n_T, T);
+end 
+if options(3) == "No"
+    dT_dz = 0;
 end 
 
 dn_CH3OH_dz = -r1*dw_dz;
@@ -290,7 +323,7 @@ P0 = 1.6; %Initial Pressure [bar]
 T0 = 523; %Initial Temperature [K]
 Kinetic_type = "LHHW";
 Pressure_drop = "No";
-Temp_dependence = "No";
+Temp_dependence = "Yes";
 %----------------------------------------------------------
 %----------------------------------------------------------
 %----------------------------------------------------------
@@ -322,3 +355,8 @@ plot(z_points, extent1, 'b-', 'LineWidth', 2); hold on;
 plot(z_points, extent2, 'r-', 'LineWidth', 2);
 title('Extent Of reaction');
 legend("Reaction 1","Reaction 2")
+
+figure("Name", "Temperature")
+plot(z_points, T, 'LineWidth', 2)
+title('Temperature Profile')
+legend('T')
