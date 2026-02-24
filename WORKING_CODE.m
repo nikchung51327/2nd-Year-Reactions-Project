@@ -305,9 +305,10 @@ plot(z_points, F_O2, 'r-', 'LineWidth', 2);
 plot(z_points, F_HCHO, 'g-', 'LineWidth', 2);
 plot(z_points, F_H2O, 'c-', 'LineWidth', 2);
 plot(z_points, F_CO, 'm-', 'LineWidth', 2);
+plot(z_points, F_N2, 'm-', 'LineWidth', 2);
 xlabel('Reactor Length (m)');
 ylabel('Molar Flow Rate (mol/s)');
-legend('CH3OH', 'O2', 'HCHO', 'H2O', 'CO');
+legend('CH3OH', 'O2', 'HCHO', 'H2O', 'CO', 'N2');
 title("Molar Flowrate of Species Across the Reactor")
 
 figure("Name","Pressure Drop Across Reactor")
