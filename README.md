@@ -31,10 +31,13 @@ parameters we need to do for sensitivity analysis
 How it affects extent of reaction?
 
 
+*Stuff to Ask GTA*
+
 interstage cooling - viable?
 
 how to determine where to introduce fresh stream in the reactor?
 
+Do we need to include tables/graphs for simple power law? 
 
 whats the best way to know number of tubes?
 
