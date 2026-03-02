@@ -29,3 +29,17 @@ parameters we need to do for sensitivity analysis
 (6) inlet flowrate / composition ratios 
 
 How it affects extent of reaction?
+
+
+interstage cooling - viable?
+
+how to determine where to introduce fresh stream in the reactor?
+
+
+whats the best way to know number of tubes?
+
+'design'? minimize number of tubes? maximize conversion?
+
+is 16k tubes reasonable?
+
+uniform heat duty feasible or not?
